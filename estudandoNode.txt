@@ -1,0 +1,27 @@
+Iniciamos o projeto na pasta alura-books-server
+npm init -y
+instalamos o express
+npm install express
+fiz o procedimento para o github e criamos o primeiro arquivo
+app.js e importamos o express
+como ele não colocou o type:module no package.json usaremos o
+este formato de importação em todo o projeto
+const express = require("express")
+logo na sequência ele cria um servidor chamando
+const app = express()
+vamos agora configurar nosso servidor
+definimos uma porta
+const port = 8000
+e fazemos a primeira rota
+
+app.get('/', (req, res) => {
+    res.send("Beleza...")
+})
+
+e depois deixamos o servidor escutando na porta
+
+app.listen(port, ()=>{
+    console.log(`Escutando a porta ${port}`)
+})
+
+roda o projeto com node app.js
