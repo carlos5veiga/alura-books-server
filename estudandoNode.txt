@@ -25,3 +25,159 @@ app.listen(port, ()=>{
 })
 
 roda o projeto com node app.js
+
+npm install nodemon para usar o hot reload com nodemon
+coloquei "dev": "nodemon app.js" no scripts do package.json
+para rodar agora, npm run dev
+
+vamos trabalhar as rotas... criamos uma pasta rotas e um arquivo livro.js
+
+Importamos Router do express e criamos uma instância para trabalhar
+
+const { Router } = require("express")
+
+const router = Router()
+
+agora é só definir as rotas de livros aqui dentro
+
+começamos de forma simples definindo um get para '/'
+perceba que ainda não se falou sobre livros ainda...
+isso vai acontecer no app.js
+Assim está livro.js
+const { Router } = require("express")
+
+const router = Router()
+
+router.get('/', (req, res) => {
+    res.send("Beleza pura...")
+})
+
+module.exports = router
+
+e assim está app.js
+
+const express = require("express")
+const rotaLivro = require("./rotas/livro")
+
+const app = express()
+
+app.use('/livros', rotaLivro)
+
+const port = 8000
+
+app.listen(port, ()=>{
+    console.log(`Escutando a porta ${port}`)
+})
+
+define-se rotaLivro e com app.use('/livros', rotaLivro)
+definimos que ela está associada a /livros....
+
+massa demais...
+
+Inicialmente vamos definir os demais métodos apenas retornando textos simples...
+os métodos ficarão praticamente iguais...
+
+const { Router } = require("express")
+
+const router = Router()
+
+router.get('/', (req, res) => {
+    res.send("Usando o método get")
+})
+
+router.post('/', (req, res) => {
+    res.send("Usando o método post")
+})
+
+router.patch('/', (req, res) => {
+    res.send("Usando o método patch")
+})
+
+router.delete('/', (req, res) => {
+    res.send("Usando o método delete")
+})
+
+module.exports = router
+
+testamos com o postman e deu tudo certo
+
+vamos usar try-catch para lidar com erros
+vou mostrar aqui o get....
+o throw new Error("teste") simula um erro... foi apenas para testar se devolve 0 500 mesmo...
+
+router.get('/', (req, res) => {
+    try {
+        throw new Error("teste")
+        res.send("Usando o método get")
+
+    } catch (error) {
+        res.status(500)
+        res.send(error.message)
+    }
+})
+
+Vai continuar sem ele...
+
+router.get('/', (req, res) => {
+    try {
+        res.send("Usando o método get")
+
+    } catch (error) {
+        res.status(500)
+        res.send(error.message)
+    }
+})
+
+
+replicando para os demais metódos o try-catch
+
+vamos agora criar controladores para separar as responsabilidades...
+
+criamos a pasta controladores e nela um aquivo livro.js
+
+cada função callback que está em rotas, será trazida para o controlador...
+
+function getLivros (req, res) {
+    try {
+        res.send("Usando o método get")
+
+    } catch (error) {
+        res.status(500)
+        res.send(error.message)
+    }
+}
+
+function postLivro (req, res) {
+    try {
+        res.send("Usando o método post")
+
+    } catch (error) {
+        res.status(500)
+        res.send(error.message)
+    }
+}
+
+module.exports = {
+    getLivros,
+    postLivro
+}
+
+o rotas será simplificado...
+
+const { Router } = require("express")
+const { getLivros, postLivro, patchLivro, deleteLivro } = require("../controladores/livro")
+
+const router = Router()
+
+router.get('/', getLivros)
+
+router.post('/', postLivro)
+
+router.patch('/', patchLivro)
+
+router.delete('/', deleteLivro)
+
+module.exports = router
+
+simples assim... excelente....
+
