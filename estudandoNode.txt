@@ -181,3 +181,73 @@ module.exports = router
 
 simples assim... excelente....
 
+Vamos agora criar um livros.json que vai funcionar como bbanco de dados
+
+[
+    {
+        "id": "1",
+        "nome": "Livro irado"
+    },
+    {
+        "id": "2",
+        "nome": "Livro muito legal"
+    }
+]
+
+vamos usar o fs para manipular arquivos
+
+const fs = require("fs")
+
+vamos usar o readFileSync para ler arquivos e o writeFileSync para escrever arquivos
+
+Para isso vamos alterar os controladores e criar os serviços
+
+o controlador ficou assim para o get
+
+const fs = require("fs")
+
+function getLivros (req, res) {
+    try {
+        const livros = JSON.parse(fs.readFileSync("livros.json"))
+        res.send(livros)
+    } catch (error) {
+        res.status(500)
+        res.send(error.message)
+    }
+}
+
+Mas o controlador não deve ser responsável por ler o arquivo...
+criaremos um serviço para fazer isso...
+
+vamos criar a pasta servicos e um arquivo livro.js
+
+vamos criar uma função para cada verbo http que usaremos
+começando pelo getTodosLivros
+
+const fs = require("fs")
+
+function getTodosLivros() {
+    return JSON.parse(fs.readFileSync("livros.json"))
+}
+
+module.exports = {
+    getTodosLivros
+}
+
+O controlador agora chama essa função no serviço
+
+o serviço é reponsável por ler o arquivo
+o controlador é responsável por enviar erro ou sucesso
+
+const { getTodosLivros } = require("../servicos/livro")
+
+function getLivros (req, res) {
+    try {
+        const livros = getTodosLivros()
+        res.send(livros)
+    } catch (error) {
+        res.status(500)
+        res.send(error.message)
+    }
+}
+
