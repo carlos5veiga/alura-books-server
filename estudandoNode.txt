@@ -251,3 +251,115 @@ function getLivros (req, res) {
     }
 }
 
+Vamos criar agora um get por id
+
+Começaremos nas rotas criar um endpoint para isso...
+
+router.get('/:id', getLivro)
+
+Neste ponto não precisamos passar o parâmetro... isso será feito no controlador....
+aqui apenas associamos a rota à função do controlador....
+A função do controlador ficou assim...
+
+function getLivro (req, res) {
+    try {
+        const id = req.params.id
+        const livro = getLivroPorId(id)
+        res.send(livro)
+    } catch (error) {
+        res.status(500)
+        res.send(error.message)
+    }
+}
+
+Aqui neste ponto é que pegamos o parâmetro....
+Claro que é necessário exportar essa função...
+
+module.exports = {
+    getLivros,
+    getLivro,
+    postLivro,
+    patchLivro,
+    deleteLivro
+}
+
+Agora vamos construir a função do service...
+
+function getLivroPorId(id) {
+    const livros = JSON.parse(fs.readFileSync("livros.json"))
+    const livro = livros.filter(livro => livro.id === id)
+    return livro
+}
+
+E também é necessário exportar....
+
+module.exports = {
+    getTodosLivros,
+    getLivroPorId
+}
+
+Entretanto, dessa maneira livro está sendo uma lista com um elemento...
+
+[
+    {
+        "id": "2",
+        "nome": "Livro muito legal"
+    }
+]
+
+Para que a resposta fique apenas com um elemento, colocamos [0] no final....
+
+const livro = livros.filter(livro => livro.id === id)[0]
+
+{
+    "id": "2",
+    "nome": "Livro muito legal"
+}
+
+Simples e tranquilo...
+
+Vamos fazer o post agora....
+e para isso vamos precisar usar o body...
+
+no postman a gente precisar configurar o body para raw e mudar para json
+
+e a gente segue o mesmo fluxo... rotas... controlador... serviço....
+
+Rota está assim....
+router.post('/', postLivro)
+
+Controlador está assim...
+
+function postLivro (req, res) {
+    try {
+        const livroNovo = req.body
+        insereLivro(livroNovo)
+        res.status(201)
+        res.send("Livro criado com sucesso")
+    } catch (error) {
+        res.status(500)
+        res.send(error.message)
+    }
+}
+
+E o service está assim....
+
+function insereLivro(livroNovo) {
+    const livros = JSON.parse(fs.readFileSync("livros.json"))
+    const livrosAtualizados = [...livros, livroNovo]
+    fs.writeFileSync("livros.json", JSON.stringify(livrosAtualizados))
+}
+
+Esta maneira de criar uma nova lista se chama spread...
+tudo o que está em livros será adicionado a livrosAtualizados e depois livroNovo será inserido...
+Muito bacanaaaaaa.....
+
+Mas tudo isso só vai funcionar se adicionarmos um middleware no arquivo app.js....
+
+app.use(express.json())
+
+Isso informa que o body vai receber os dados no formato json...
+super importante isso...
+caso não seja feito, o que vai ser inserido no banco vai ser null
+
+
